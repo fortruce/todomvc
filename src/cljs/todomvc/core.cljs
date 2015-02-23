@@ -1,6 +1,6 @@
 (ns todomvc.core
-    (:require [reagent.core :as reagent :refer [atom]]
-              [cljsjs.react :as react]))
+  (:require [reagent.core :as reagent :refer [atom]]
+            [cljsjs.react :as react]))
 
 ;; -------------------------
 ;; Views
@@ -43,25 +43,26 @@
                 (add-todo! "Create Todo App")
                 (add-todo! "Run 4 miles")))
 
+(defn focus [component]
+  (.focus (reagent/dom-node component)))
+
 (defn todo-input
   "Input box for todos. Pass in initial title and a callback for on-save."
   [{:keys [text on-save]}]
-  (let [val (atom text)
-        save #(let [v (-> @val str clojure.string/trim)]
-               (if-not (empty? v)
-                 (on-save v)))]
-    (fn []
-      [:input {:type "text"
-               :value @val
-               :on-blur save
-               :on-change #(reset! val (.. % -target -value))
-               :on-key-down #(case (.-which %)
-                               13 (save)
-                               nil)}])))
-
-(def todo-edit
-  "A todo-input with focus when spawned."
-  (with-meta todo-input {:component-did-mount #(.focus (reagent/dom-node %))}))
+  (reagent/create-class {:render
+                         (let [val (atom text)
+                               save #(let [v (-> @val str clojure.string/trim)]
+                                       (if-not (empty? v)
+                                         (on-save v)))]
+                           (fn []
+                             [:input {:type "text"
+                                      :value @val
+                                      :on-blur save
+                                      :on-change #(reset! val (.. % -target -value))
+                                      :on-key-down #(case (.-which %)
+                                                      13 (save)
+                                                      nil)}]))
+                         :component-did-mount focus}))
 
 (defn todo-entry []
   (let [editing (atom false)]
@@ -72,9 +73,9 @@
         [:input {:type "checkbox"
                  :on-change #(toggle! id)}]
         [:label {:on-double-click #(reset! editing true)} text]
-        [:button {:on-click #(remove-todo! id)} "X"]]
+        [:a {:on-click #(remove-todo! id)} "X"]]
        (when @editing
-         [todo-edit {:text text
+         [todo-input {:text text
                       :on-save #(do (save! id %)
                                     (reset! editing false))}])])))
 
