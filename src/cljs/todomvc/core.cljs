@@ -1,49 +1,91 @@
 (ns todomvc.core
     (:require [reagent.core :as reagent :refer [atom]]
-              [reagent.session :as session]
-              [secretary.core :as secretary :include-macros true]
-              [goog.events :as events]
-              [goog.history.EventType :as EventType]
-              [cljsjs.react :as react])
-    (:import goog.History))
+              [cljsjs.react :as react]))
 
 ;; -------------------------
 ;; Views
 
-(defn home-page []
-  [:div [:h2 "Welcome to todomvc"]
-   [:div [:a {:href "#/about"} "go to about page"]]])
+;; Use sorted map so all todos are in order by addition
+(defonce app-state
+  (atom (sorted-map)))
 
-(defn about-page []
-  [:div [:h2 "About todomvc"]
-   [:div [:a {:href "#/"} "go to the home page"]]])
+;; Todo counter to create ids
+(def counter (atom 0))
 
-(defn current-page []
-  [:div [(session/get :current-page)]])
+;;
+;; App-State modification functions
+;;
+(defn add-todo!
+  "Add a todo to the app-state with text"
+  [text]
+  (let [id (swap! counter inc)]
+    (swap! app-state assoc id {:id id :text text :done false})))
 
-;; -------------------------
-;; Routes
-(secretary/set-config! :prefix "#")
+(defn toggle!
+  "Toggle the :done status of todo by id"
+  [id]
+  (swap! app-state update-in [id :done] not))
 
-(secretary/defroute "/" []
-  (session/put! :current-page #'home-page))
+(defn remove-todo!
+  "Remove todo by id"
+  [id]
+  (swap! app-state dissoc id))
 
-(secretary/defroute "/about" []
-  (session/put! :current-page #'about-page))
+(defn save!
+  "Save edits to todo's title by id"
+  [id text]
+  (swap! app-state assoc-in [id :text] text))
 
-;; -------------------------
-;; History
-;; must be called after routes have been defined
-(defn hook-browser-navigation! []
-  (doto (History.)
-    (events/listen
-     EventType/NAVIGATE
-     (fn [event]
-       (secretary/dispatch! (.-token event))))
-    (.setEnabled true)))
+;;
+;; Create initial app state
+;;
+(defonce init (do
+                (add-todo! "Create Todo App")
+                (add-todo! "Run 4 miles")))
 
-;; -------------------------
-;; Initialize app
+(defn todo-input
+  "Input box for todos. Pass in initial title and a callback for on-save."
+  [{:keys [text on-save]}]
+  (let [val (atom text)
+        save #(let [v (-> @val str clojure.string/trim)]
+               (if-not (empty? v)
+                 (on-save v)))]
+    (fn []
+      [:input {:type "text"
+               :value @val
+               :on-blur save
+               :on-change #(reset! val (.. % -target -value))
+               :on-key-down #(case (.-which %)
+                               13 (save)
+                               nil)}])))
+
+(def todo-edit
+  "A todo-input with focus when spawned."
+  (with-meta todo-input {:component-did-mount #(.focus (reagent/dom-node %))}))
+
+(defn todo-entry []
+  (let [editing (atom false)]
+    (fn [{:keys [id text done]}]
+      [:li {:class (str (if done "completed ")
+                        (if @editing "editing"))}
+       [:div
+        [:input {:type "checkbox"
+                 :on-change #(toggle! id)}]
+        [:label {:on-double-click #(reset! editing true)} text]
+        [:button {:on-click #(remove-todo! id)} "X"]]
+       (when @editing
+         [todo-edit {:text text
+                      :on-save #(do (save! id %)
+                                    (reset! editing false))}])])))
+
+(defn todo-app [_]
+  (fn []
+    [:ul
+     (for [todo (vals @app-state)]
+       ^{:key (:id todo)} [todo-entry todo])]))
+
+  ;; -------------------------
+  ;; Initialize app
+
 (defn init! []
-  (hook-browser-navigation!)
-  (reagent/render-component [current-page] (.getElementById js/document "app")))
+  (reagent/render-component [todo-app] (.getElementById js/document "app")))
