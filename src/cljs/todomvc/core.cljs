@@ -10,7 +10,7 @@
   (atom (sorted-map)))
 
 ;; Todo counter to create ids
-(def counter (atom 0))
+(defonce counter (atom 0))
 
 ;;
 ;; App-State modification functions
@@ -79,11 +79,31 @@
                       :on-save #(do (save! id %)
                                     (reset! editing false))}])])))
 
+(defn new-todo []
+  (let [todo (atom "")]
+    (reagent/create-class {:render
+                           (fn []
+                              [:input {:type "text"
+                                       :placeholder "Enter new todo..."
+                                       :value @todo
+                                       :on-change #(reset! todo (.. % -target -value))
+                                       :on-key-down #(case (.-which %)
+                                                       13 ((fn [_] (if-not (empty? (-> @todo str clojure.string/trim))
+                                                                     (do
+                                                                       (add-todo! @todo)
+                                                                       (reset! todo "")))))
+                                                       nil)}])
+                           :component-did-mount focus})))
+
 (defn todo-app [_]
   (fn []
-    [:ul
-     (for [todo (vals @app-state)]
-       ^{:key (:id todo)} [todo-entry todo])]))
+    [:div.container
+     [:header#header
+      [:h1 "todos"]
+      [new-todo]]
+     [:ul
+      (for [todo (vals @app-state)]
+        ^{:key (:id todo)} [todo-entry todo])]]))
 
   ;; -------------------------
   ;; Initialize app
