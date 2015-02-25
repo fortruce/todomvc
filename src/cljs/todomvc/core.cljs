@@ -75,14 +75,11 @@
   (let [editing (atom false)]
     (fn [{:keys [id text done]}]
       [:li {:class (if @editing "editing")}
-       (let [checkbox-id (str "check" id)]
-         [:div
-          [:input {:type "checkbox"
-                   :id checkbox-id
-                   :on-change #(toggle! id)}]
-          [:label {:for checkbox-id
-                   :on-double-click #(reset! editing true)} text]
-          [:a.destroy {:on-click #(remove-todo! id)}]])
+       [:div.todo-entry
+        [:input {:type "checkbox"
+                 :on-change #(toggle! id)}]
+        [:label {:on-double-click #(reset! editing true)} text]
+        [:a.destroy {:on-click #(remove-todo! id)}]]
        (when @editing
          [todo-input {:text text
                       :on-save #(do (save! id %)
