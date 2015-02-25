@@ -101,13 +101,17 @@ input {
 #todo-list a:after {
     content: "✖";
     font-size: 26px;
-    color: #888888;
+    color: rgba(169,169,169,.75);
     float: right;
     display: none;
 }
 
 #todo-list li:hover a:after {
     display: inline;
+}
+
+#todo-list a:hover:after {
+    color: rgba(169, 169, 169, 1);
 }
 
 input[type="checkbox"] {
@@ -139,5 +143,5 @@ input[type="checkbox"] + label {
 
 input[type="checkbox"]:checked + label {
   text-decoration: line-through;
-  color: rgba(47, 47, 47, 0.4);
+  color: rgba(169, 169, 169, 0.5);
 }
