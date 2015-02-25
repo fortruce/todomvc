@@ -76,7 +76,7 @@
                    :on-change #(toggle! id)}]
           [:label {:for checkbox-id
                    :on-double-click #(reset! editing true)} text]
-          [:a.destroy {:on-click #(remove-todo! id)} "X"]])
+          [:a.destroy {:on-click #(remove-todo! id)}]])
        (when @editing
          [todo-input {:text text
                       :on-save #(do (save! id %)
@@ -101,7 +101,7 @@
 
 (defn todo-app [_]
   (fn []
-    [:div.todo-app
+    [:div#todo-app
      [:header
       [:h1#header "todos"]
       [new-todo]]

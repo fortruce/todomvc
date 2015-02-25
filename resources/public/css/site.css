@@ -51,6 +51,8 @@ table {
  * ACTUAL CSS
  */
 
+@charset "UTF-8";
+
 *{
   box-sizing: border-box;
 }
@@ -94,6 +96,18 @@ input {
 
 #todo-list li {
   border-top: none;
+}
+
+#todo-list a:after {
+    content: "✖";
+    font-size: 26px;
+    color: #888888;
+    float: right;
+    display: none;
+}
+
+#todo-list li:hover a:after {
+    display: inline;
 }
 
 input[type="checkbox"] {
