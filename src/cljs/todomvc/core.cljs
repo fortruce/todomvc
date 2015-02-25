@@ -46,6 +46,15 @@
 (defn focus [component]
   (.focus (reagent/dom-node component)))
 
+(defn atom-input
+  ([value] (atom-input value nil))
+  ([value props]
+   [:input (merge
+            {:type "text"
+             :value @value
+             :on-change #(reset! value (-> % .-target .-value))}
+            props)]))
+
 (defn todo-input
   "Input box for todos. Pass in initial title and a callback for on-save."
   [{:keys [text on-save]}]
@@ -55,13 +64,11 @@
                                        (if-not (empty? v)
                                          (on-save v)))]
                            (fn []
-                             [:input {:type "text"
-                                      :value @val
-                                      :on-blur save
-                                      :on-change #(reset! val (.. % -target -value))
-                                      :on-key-down #(case (.-which %)
-                                                      13 (save)
-                                                      nil)}]))
+                             (atom-input val
+                                         {:on-blur save
+                                          :on-key-down #(case (.-which %)
+                                                          13 (save)
+                                                          nil)})))
                          :component-did-mount focus}))
 
 (defn todo-entry []
@@ -81,31 +88,21 @@
                       :on-save #(do (save! id %)
                                     (reset! editing false))}])])))
 
-(defn atom-input
-  ([value] (atom-input value nil))
-  ([value props]
-   [:input (merge
-            {:type "text"
-             :value @value
-             :on-change #(reset! value (-> % .-target .-value))}
-            props)]))
-
 
 (defn new-todo []
   (let [todo (atom "")]
     (reagent/create-class {:render
                            (fn []
-                              [:input#new-todo
-                               {:type "text"
-                                :value @todo
-                                :placeholder "What needs to be done?"
-                                :on-change #(reset! todo (.. % -target -value))
-                                :on-key-down #(case (.-which %)
-                                                13 ((fn [_] (if-not (empty? (-> @todo str clojure.string/trim))
-                                                              (do
-                                                                (add-todo! @todo)
-                                                                (reset! todo "")))))
-                                                nil)}])
+                             (atom-input
+                              todo
+                              {:id "new-todo"
+                               :placeholder "What needs to be done?"
+                               :on-key-down #(case (.-which %)
+                                               13 ((fn [_] (if-not (empty? (-> @todo str clojure.string/trim))
+                                                             (do
+                                                               (add-todo! @todo)
+                                                               (reset! todo "")))))
+                                               nil)}))
                            :component-did-mount focus})))
 
 (defn todo-app [_]
