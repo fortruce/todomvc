@@ -52,6 +52,7 @@
    [:input (merge
             {:type "text"
              :value @value
+             :on-focus #(set! (-> % .-target .-value) @value)
              :on-change #(reset! value (-> % .-target .-value))}
             props)]))
 
