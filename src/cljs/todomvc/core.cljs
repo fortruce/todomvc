@@ -60,7 +60,7 @@
   [{:keys [text on-save]}]
   (reagent/create-class {:render
                          (let [val (atom text)
-                               save #(let [v (-> @val str clojure.string/trim)]
+                               save #(let [v (clojure.string/trim @val)]
                                        (if-not (empty? v)
                                          (on-save v)))]
                            (fn []
@@ -98,10 +98,11 @@
                               {:id "new-todo"
                                :placeholder "What needs to be done?"
                                :on-key-down #(case (.-which %)
-                                               13 ((fn [_] (if-not (empty? (-> @todo str clojure.string/trim))
-                                                             (do
-                                                               (add-todo! @todo)
-                                                               (reset! todo "")))))
+                                               13 ((fn [_]
+                                                     (if-not (empty? (clojure.string/trim @todo))
+                                                       (do
+                                                         (add-todo! @todo)
+                                                         (reset! todo "")))))
                                                nil)}))
                            :component-did-mount focus})))
 
