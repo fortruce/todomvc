@@ -60,88 +60,107 @@ table {
 body {
   font-size: 20px;
   font-family: Helvetica;
+  color: rgba(50,50,50,.95);
   background: #f5f5f5;
-}
-
-input {
-  font: inherit;
+  line-height: 1.4em;
 }
 
 #header {
   text-align: center;
-  font-size: 60px;
-  margin: 15px;
+  font-size: 80px;
+  margin: 40px;
   color: rgba(175, 47, 47, 0.15);
 }
 
 #todo-app {
-  margin: 10px auto;
+  margin: 0 auto;
   max-width: 400px;
-  padding: 5px;
   /* must be relatively positioned to contain the absolute positioning of the checkbox svg */
   position: relative;
 }
 
-#new-todo {
+input[type="text"] {
+  font: inherit;
   width: 100%;
   outline: none;
 }
 
+#new-todo {
+    padding: 15px 15px 15px 60px;
+}
+
 #new-todo,
 #todo-list li {
-  padding: 15px;
   border: 2px solid #ededed;
   background-color: #fff;
 }
-
 #todo-list li {
   border-top: none;
+  position: relative;
 }
 
-#todo-list a:after {
+/* Create 'X' .destroy that only appear on hover of previous label */
+#todo-list li .destroy {
+    /* position it absolute in parent */
+    position: absolute;
+    top: 0; bottom: 0;
+    margin: auto;
+    height: 30px;
+
+    /* position it 10px into the right side of the parent */
+    right: 10px;
+}
+#todo-list .destroy:after {
     content: "✖";
     font-size: 26px;
     color: rgba(169,169,169,.75);
-    float: right;
     display: none;
 }
-
-#todo-list li:hover a:after {
+#todo-list li:hover .destroy:after {
     display: inline;
 }
-
-#todo-list a:hover:after {
+#todo-list .destroy:hover:after {
     color: rgba(169, 169, 169, 1);
+}
+/* .destroy */
+
+
+#todo-list li.editing .todo-entry {
+    display:none
+}
+
+#todo-list label {
+    display: block;
+    position: relative;
+    word-break: break-all;
+    padding: 15px 60px 15px 15px;
+    margin-left: 45px;
 }
 
 input[type="checkbox"] {
-  /* allow it to sit to the left of the label */
+  /* allow it to sit to the left of the label
+     top, bottom: 0 + defined height w/ abs position
+       centers the checkbox SVG vertically */
   position: absolute;
-  
+  margin: auto;
+  top: 0; bottom: 0;
+  height: 40px;
+
   /* remove default styling */
   outline: none;
   -webkit-appearance: none;
-  
-  margin-top: -10px;
-  margin-left: -10px;
-  /* and hide the extra sprite image */
-  overflow: hidden;
 }
 
 input[type="checkbox"]:after {
-  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -10 120 120"><circle cx="50" cy="50" r="50" fill="none" stroke="#ebebeb" stroke-width="3"/></svg>');
+  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-18 -18 100 145"><circle cx="50" cy="50" r="50" fill="none" stroke="#ebebeb" stroke-width="3"/></svg>');
 }
 
 input[type="checkbox"]:checked:after {
-  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -10 120 120"><circle cx="50" cy="50" r="50" fill="none" stroke="#ebebeb" stroke-width="3"/><circle cx="50" cy="50" r="30" stroke="#72F784" stroke-width="10" fill="none" /></svg>');
-}
-
-input[type="checkbox"] + label {
-  /* push the label to the right of the svg */
-  margin-left: 40px;
+  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-18 -18 100 145"><circle cx="50" cy="50" r="50" fill="none" stroke="#ebebeb" stroke-width="3"/><circle cx="50" cy="50" r="30" stroke="#72F784" stroke-width="10" fill="none" /></svg>');
 }
 
 input[type="checkbox"]:checked + label {
   text-decoration: line-through;
   color: rgba(169, 169, 169, 0.5);
 }
+/* end SVG checkbox */
