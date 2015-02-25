@@ -51,31 +51,79 @@ table {
  * ACTUAL CSS
  */
 
-.container {
-    max-width: 300px;
-    margin: 0 auto;
+*{
+  box-sizing: border-box;
 }
 
-.completed {
-    background: green;
-    text-decoration: line-through;
-    }
+body {
+  font-size: 20px;
+  font-family: Helvetica;
+  background: #f5f5f5;
+}
 
-li {
-    border-radius: 10px;
-    border: 1px solid grey;
-    margin: 5px auto;
-    }
+input {
+  font: inherit;
+}
+
+#header {
+  text-align: center;
+  font-size: 60px;
+  margin: 15px;
+  color: rgba(175, 47, 47, 0.15);
+}
+
+#todo-app {
+  margin: 10px auto;
+  max-width: 400px;
+  padding: 5px;
+  /* must be relatively positioned to contain the absolute positioning of the checkbox svg */
+  position: relative;
+}
+
+#new-todo {
+  width: 100%;
+  outline: none;
+}
+
+#new-todo,
+#todo-list li {
+  padding: 15px;
+  border: 2px solid #ededed;
+  background-color: #fff;
+}
+
+#todo-list li {
+  border-top: none;
+}
 
 input[type="checkbox"] {
-    margin-right: 5px;
-    border-radius: 50%;
-    -webkit-appearance: none;
-    width: 10px;
-    height: 10px;
-    border: 1px solid grey;
-    }
+  /* allow it to sit to the left of the label */
+  position: absolute;
+  
+  /* remove default styling */
+  outline: none;
+  -webkit-appearance: none;
+  
+  margin-top: -10px;
+  margin-left: -10px;
+  /* and hide the extra sprite image */
+  overflow: hidden;
+}
 
-input[type="checkbox"]:checked {
-    background: black;
-    }
+input[type="checkbox"]:after {
+  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -10 120 120"><circle cx="50" cy="50" r="50" fill="none" stroke="#ebebeb" stroke-width="3"/></svg>');
+}
+
+input[type="checkbox"]:checked:after {
+  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="-10 -10 120 120"><circle cx="50" cy="50" r="50" fill="none" stroke="#ebebeb" stroke-width="3"/><circle cx="50" cy="50" r="30" stroke="#72F784" stroke-width="10" fill="none" /></svg>');
+}
+
+input[type="checkbox"] + label {
+  /* push the label to the right of the svg */
+  margin-left: 40px;
+}
+
+input[type="checkbox"]:checked + label {
+  text-decoration: line-through;
+  color: rgba(47, 47, 47, 0.4);
+}

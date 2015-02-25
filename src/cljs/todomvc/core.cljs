@@ -69,11 +69,14 @@
     (fn [{:keys [id text done]}]
       [:li {:class (str (if done "completed ")
                         (if @editing "editing"))}
-       [:div
-        [:input {:type "checkbox"
-                 :on-change #(toggle! id)}]
-        [:label {:on-double-click #(reset! editing true)} text]
-        [:a {:on-click #(remove-todo! id)} "X"]]
+       (let [checkbox-id (str "check" id)]
+         [:div
+          [:input {:type "checkbox"
+                   :id checkbox-id
+                   :on-change #(toggle! id)}]
+          [:label {:for checkbox-id
+                   :on-double-click #(reset! editing true)} text]
+          [:a.destroy {:on-click #(remove-todo! id)} "X"]])
        (when @editing
          [todo-input {:text text
                       :on-save #(do (save! id %)
@@ -83,25 +86,26 @@
   (let [todo (atom "")]
     (reagent/create-class {:render
                            (fn []
-                              [:input {:type "text"
-                                       :placeholder "Enter new todo..."
-                                       :value @todo
-                                       :on-change #(reset! todo (.. % -target -value))
-                                       :on-key-down #(case (.-which %)
-                                                       13 ((fn [_] (if-not (empty? (-> @todo str clojure.string/trim))
-                                                                     (do
-                                                                       (add-todo! @todo)
-                                                                       (reset! todo "")))))
-                                                       nil)}])
+                              [:input#new-todo
+                               {:type "text"
+                                :placeholder "What needs to be done?"
+                                :value @todo
+                                :on-change #(reset! todo (.. % -target -value))
+                                :on-key-down #(case (.-which %)
+                                                13 ((fn [_] (if-not (empty? (-> @todo str clojure.string/trim))
+                                                              (do
+                                                                (add-todo! @todo)
+                                                                (reset! todo "")))))
+                                                nil)}])
                            :component-did-mount focus})))
 
 (defn todo-app [_]
   (fn []
-    [:div.container
-     [:header#header
-      [:h1 "todos"]
+    [:div.todo-app
+     [:header
+      [:h1#header "todos"]
       [new-todo]]
-     [:ul
+     [:ul#todo-list
       (for [todo (vals @app-state)]
         ^{:key (:id todo)} [todo-entry todo])]]))
 
