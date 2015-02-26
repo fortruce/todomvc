@@ -109,7 +109,7 @@ input[type="text"] {
     content: "✖";
     font-size: 26px;
     color: rgba(169,169,169,.75);
-    display: inline;
+    display: none;
 }
 #todo-list li:hover .destroy:after {
     display: inline;
