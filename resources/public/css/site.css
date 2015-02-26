@@ -53,10 +53,6 @@ table {
 
 @charset "UTF-8";
 
-*{
-  box-sizing: border-box;
-}
-
 body {
   font-size: 20px;
   font-family: Helvetica;
@@ -68,15 +64,14 @@ body {
 #header {
   text-align: center;
   font-size: 80px;
-  margin: 40px;
+  margin: 40px auto;
   color: rgba(175, 47, 47, 0.15);
 }
 
 #todo-app {
   margin: 0 auto;
-  max-width: 400px;
-  /* must be relatively positioned to contain the absolute positioning of the checkbox svg */
-  position: relative;
+  max-width: 600px;
+  min-width: 300px;
 }
 
 input[type="text"] {
@@ -114,7 +109,7 @@ input[type="text"] {
     content: "✖";
     font-size: 26px;
     color: rgba(169,169,169,.75);
-    display: none;
+    display: inline;
 }
 #todo-list li:hover .destroy:after {
     display: inline;
@@ -124,9 +119,13 @@ input[type="text"] {
 }
 /* .destroy */
 
-
 #todo-list li.editing .todo-entry {
     display:none
+}
+
+#todo-list li.editing input {
+    box-sizing: border-box;
+    padding: 13px 15px 13px 55px;
 }
 
 #todo-list label {
